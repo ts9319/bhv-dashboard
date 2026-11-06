@@ -89,6 +89,45 @@ h2{font-size:15.5px;font-weight:600;margin:0;text-wrap:balance}
 .card .ch{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;justify-content:space-between}
 .insights{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;color:var(--ink-2);max-width:100ch}
 .insights b{color:var(--ink);font-weight:600}
+.warn-ctl{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:12px;color:var(--ink-2)}
+.warn-ctl label{display:inline-flex;align-items:center;gap:6px}
+.warn-ctl input{font:inherit;font-size:12px;width:58px;padding:2px 6px;border-radius:6px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.warn-ctl input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.wgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:980px){.wgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.wgrid{grid-template-columns:minmax(0,1fr)}}
+.wbox{border:1px solid var(--line);border-radius:7px;padding:7px 9px;display:flex;flex-direction:column;gap:3px;min-width:0;height:196px;overflow:hidden;background:var(--panel)}
+.wbox.hit{border-left:3px solid var(--bad);padding-left:7px}
+.wh{display:flex;align-items:center;justify-content:space-between;gap:2px 6px;flex-wrap:wrap;margin-bottom:1px}
+.wh b{font-size:11.5px;font-weight:600;color:var(--ink);line-height:1.3}
+.wh .sub{font-size:10.5px;line-height:1.3}
+.wh .pill{font-size:10px;padding:0 6px}
+.wrow{display:grid;grid-template-columns:minmax(48px,82px) minmax(0,1fr) 38px;align-items:center;gap:6px;font-size:11px;line-height:1.25;font-variant-numeric:tabular-nums;cursor:pointer;border-radius:4px;padding:1px 3px;margin:0 -3px}
+.wrow:hover,.wrow:focus-visible{background:var(--panel-2)}
+.wrow:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.wrow.sel .wn{color:var(--accent);font-weight:600}
+.wn{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wv{text-align:right;font-weight:600;color:var(--ink)}
+.wv.bad{color:var(--bad-ink)}
+.wtrk{position:relative;display:block;height:5px;border-radius:3px;background:var(--line)}
+.wfill{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.wthr{position:absolute;top:-3px;bottom:-3px;width:1.5px;margin-left:-.75px;background:var(--ink-2);border-radius:1px}
+.wmid{display:flex;align-items:center;gap:5px;min-width:0}
+.wmid .wtrk{flex:1;min-width:16px}
+.wchip{flex:none;font-size:9.5px;font-weight:600;line-height:14px;padding:0 5px;border-radius:999px;background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad-ink);white-space:nowrap}
+.wdots{display:flex;gap:3px;min-width:0}
+.wdot{display:inline-flex;align-items:center;justify-content:center;flex:1 1 0;max-width:30px;min-width:0;height:13px;border-radius:3px;background:color-mix(in srgb,var(--bad) 18%,var(--panel));border:1px solid color-mix(in srgb,var(--bad) 45%,transparent);color:var(--bad-ink);font-size:9px;font-weight:600;overflow:hidden}
+.wmore,.wnone{font-size:10.5px;color:var(--muted);line-height:1.3}
+.wh,.wscale,.wnone{flex:none}
+.wlist{flex:1 1 auto;min-height:0;max-height:144px;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:3px;padding:0 3px 0 3px;margin:0 -3px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--axis) transparent}
+.wlist::-webkit-scrollbar{width:4px}
+.wlist::-webkit-scrollbar-track{background:transparent}
+.wlist::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.wlist:hover::-webkit-scrollbar-thumb{background:var(--muted)}
+.wlist .wrow{margin:0}
+.wscale{display:grid;grid-template-columns:minmax(48px,82px) minmax(0,1fr) 38px;gap:6px;font-size:9px;color:var(--muted)}
+.wscale>span:nth-child(2){position:relative;height:10px}
+.wscale i{position:absolute;transform:translateX(-50%);font-style:normal;white-space:nowrap}
 .g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
 .g32{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:14px}
 @media (max-width:920px){.g2,.g32{grid-template-columns:minmax(0,1fr)}}
@@ -164,7 +203,7 @@ tr.total td{font-weight:700;background:var(--panel-2)}
 (function(){
 "use strict";
 const NV_LEVEL={"Chung":0,"Xe Cơ giới":1,"Xe máy":2,"Ô tô":2,"TNDS, NNTX":3,"Vật chất xe":3,"Con người":1,"Con người CSSK":2,"Học sinh":2,"Con người khác":2,"TSKT":1,"Tài sản":2,"Kỹ thuật":2,"Trách nhiệm, hỗn hợp":2,"Hàng hải":1,"Hàng Hóa":2,"Tàu":2};
-const S={hid:new Set(),d:null,map:null,year:0,last:0,month:0,unit:"",nv:"Chung",grp:"all",view:"lk",company:"Tổng công ty",sort:{k:"pLk",dir:-1},assetId:null,local:false,meta:null};
+const S={hid:new Set(),d:null,map:null,year:0,last:0,month:0,unit:"",nv:"Chung",grp:"all",view:"lk",company:"Tổng công ty",sort:{k:"pLk",dir:-1},assetId:null,local:false,meta:null,warnRev:70,warnVcx:65};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const short=u=>String(u).replace(/^BHV\s+/,"");
@@ -288,6 +327,7 @@ function renderAll(){
   if(o.left>0&&o.khNam>0){const r=div(o.need,avg3);ins.push(`Để hoàn thành KH năm còn <b>${T(Math.max(o.rem,0))} tỷ</b>, tức ${T(o.need)} tỷ/tháng${r!=null?(r>1.15?`, gấp <b>${nf1.format(r)} lần</b> bình quân 3 tháng gần nhất (${T(avg3)})`:`, trong tầm bình quân 3 tháng gần nhất (${T(avg3)})`):""}. Đến nay đã bằng ${P(o.pCkNam)} doanh thu cả năm ${Y-1}.`)}
   if(o.tl!=null)ins.push(`TLBT lũy kế ${P(o.tl)}${o.tlCk!=null?`, ${o.dTl>0?"<span class='down'>tăng</span>":"<span class='up'>giảm</span>"} ${nf1.format(Math.abs(o.dTl*100))} điểm so với cùng kỳ (${P(o.tlCk)})`:""}.`);
   h+=`<div class="card"><div class="ch"><h3>Điểm chính · ${esc(uname)} · ${esc(nvName(n))}</h3><span class="sub">Tự sinh từ số liệu theo bộ lọc</span></div><ul class="insights">${ins.map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
+  h+=`<div class="card"><div class="ch"><h3>Cảnh báo · tháng ${m}/${Y}</h3><span class="sub">Toàn bộ đơn vị, trừ Tổng công ty</span></div><div class="warn-ctl"><label for="warnRevPct">Ngưỡng hoàn thành KH lũy kế dưới <input id="warnRevPct" type="number" min="0" max="500" step="1" value="${S.warnRev}"> %</label><label for="warnVcxTlbt">Ngưỡng TLBT Vật chất xe trên <input id="warnVcxTlbt" type="number" min="0" max="500" step="1" value="${S.warnVcx}"> %</label></div><div class="wgrid" id="warnList"></div></div>`;
 
   /* Diễn biến */
   h+=`<section class="sec"><div class="st"><h2>Diễn biến ${Y} so với ${Y-1}</h2><span class="sub">${esc(uname)} · ${esc(nvName(n))}</span></div><div class="g32">`;
@@ -324,7 +364,60 @@ function renderAll(){
   $("app").innerHTML=h;
   drawAll();syncLegends();
 }
-function drawAll(){drawTrend();drawYoy();drawWf();drawMix();drawNv();drawUnits();drawUyoy();drawHeat();drawMatrix();drawUnitTable();drawTlNv();drawTlU()}
+function drawAll(){drawWarnings();drawTrend();drawYoy();drawWf();drawMix();drawNv();drawUnits();drawUyoy();drawHeat();drawMatrix();drawUnitTable();drawTlNv();drawTlU()}
+function drawWarnings(){
+  const el=$("warnList");if(!el)return;
+  const Y=S.year,m=S.month,C="Chung",VCX="Vật chất xe";
+  const rev=isFinite(+S.warnRev)?+S.warnRev:0,vcx=isFinite(+S.warnVcx)?+S.warnVcx:0;
+  const units=S.d.units.filter(u=>u!==S.company).filter(u=>{const o=M(u,C);return o.khNam>0||o.thLk>0||o.ckLk>0});
+  const nvs=S.d.nv.filter(n=>n!==C);
+  const months=m>=3?[m-2,m-1,m]:[];
+  const rng=m>=3?`T${m-2}–T${m}`:"";
+  const pc=x=>Math.max(0,Math.min(100,x));
+  const row=(u,mid,val,vc,tip)=>`<div class="wrow${u===S.unit?" sel":""}" data-u="${esc(u)}" tabindex="0" title="${esc(tip)}"><span class="wn">${esc(short(u))}</span>${mid}<span class="wv${vc?" "+vc:""}">${val}</span></div>`;
+  const box=(title,sub,items,render,extra)=>{
+    let h=`<div class="wbox${items&&items.length?" hit":""}"><div class="wh"><b>${title}</b><span class="sub">${sub}</span></div>`;
+    if(items==null)h+=`<div class="wnone">Cần dữ liệu từ tháng 3 trở đi</div>`;
+    else if(!items.length)h+=`<div class="wnone">Không có đơn vị nào</div>`;
+    else h+=(extra||"")+`<div class="wlist">${items.map(render).join("")}</div>`;
+    return h+`</div>`;
+  };
+  const cnt=a=>a==null?"":`<span class="pill ${a.length?"bad":"na"}">${a.length} đơn vị</span>`;
+  const scale=(thr,max)=>`<div class="wscale"><span></span><span><i style="left:0;transform:none">0%</i><i style="left:${pc(thr/max*100)}%">${nf0.format(thr)}%</i>${max>thr*1.15?`<i style="left:100%;transform:translateX(-100%)">${nf0.format(max)}%</i>`:""}</span><span></span></div>`;
+
+  /* A. Hoàn thành KH lũy kế dưới ngưỡng — thấp nhất trước */
+  const A=units.map(u=>({u,p:M(u,C).pLk})).filter(x=>x.p!=null&&x.p*100<rev).sort((x,y)=>x.p-y.p);
+  const aMax=Math.max(100,rev);
+  const hA=box(`Hoàn thành KH lũy kế dưới ${nf0.format(rev)}%`,cnt(A)+` · lũy kế ${m} tháng`,A,x=>{
+    const bad=x.p*100<rev-15;
+    return row(x.u,`<span class="wtrk"><span class="wfill" style="width:${pc(x.p*100/aMax*100)}%;background:${bad?"var(--bad)":"var(--warn)"}"></span><span class="wthr" style="left:${pc(rev/aMax*100)}%"></span></span>`,P(x.p),bad?"bad":"",`${x.u}: đạt ${P(x.p)} KH lũy kế ${m} tháng (ngưỡng ${nf0.format(rev)}%)`);
+  },scale(rev,aMax));
+
+  /* B. Tăng trưởng âm ở ≥3 nghiệp vụ — nhiều NV âm nhất, rồi Tổng giảm sâu nhất */
+  const B=[];units.forEach(u=>{const neg=nvs.filter(n=>{const g=M(u,n).gLk;return ok(g)&&g<0});if(neg.length>=3)B.push({u,n:neg.length,names:neg,g:M(u,C).gLk})});
+  B.sort((x,y)=>y.n-x.n||((ok(x.g)?x.g:9)-(ok(y.g)?y.g:9)));
+  const bMax=Math.max(.05,...B.map(x=>ok(x.g)?Math.min(1,Math.abs(x.g)):0));
+  const hB=box("Tăng trưởng âm ở từ 3 nghiệp vụ",cnt(B)+` · tăng trưởng Tổng, lũy kế ${m} tháng`,B,x=>{
+    const g=ok(x.g)?x.g:null,w=g==null?0:pc(Math.min(1,Math.abs(g))/bMax*100);
+    return row(x.u,`<span class="wmid"><span class="wchip">${x.n} NV</span><span class="wtrk"><span class="wfill" style="width:${w}%;background:${g!=null&&g<0?"var(--bad)":"var(--s1)"}"></span></span></span>`,SP(g),g!=null&&g<0?"bad":"",`${x.u}: ${x.n} NV giảm svck (${x.names.join(", ")}) · Tổng ${SP(g)}`);
+  });
+
+  /* C. Không đạt KH tháng 3 tháng liên tiếp — tháng gần nhất thấp nhất trước */
+  const Cc=m>=3?units.filter(u=>months.every(k=>v(0,Y,k,u,0,C)<v(1,Y,k,u,0,C))).map(u=>({u,ps:months.map(k=>div(v(0,Y,k,u,0,C),v(1,Y,k,u,0,C)))})).sort((x,y)=>(x.ps[2]??9)-(y.ps[2]??9)):null;
+  const hC=box("Không đạt KH tháng 3 tháng liên tiếp",cnt(Cc)+(rng?` · ${rng} · % KH T${m}`:""),Cc,x=>
+    row(x.u,`<span class="wdots">${x.ps.map((p,i)=>`<span class="wdot" title="T${months[i]}: ${P(p)} KH">T${months[i]}</span>`).join("")}</span>`,P(x.ps[2]),"bad",`${x.u}: ${months.map((k,i)=>`T${k} ${P(x.ps[i])}`).join(" · ")}`));
+
+  /* D. TLBT VCX vượt ngưỡng 3 tháng liên tiếp — cao nhất trước */
+  const D=m>=3&&S.nIdx[VCX]!=null?units.map(u=>({u,ts:months.map(k=>tl(Y,k,u,VCX))})).filter(x=>x.ts.every(t=>t!=null&&t*100>vcx)).sort((x,y)=>y.ts[2]-x.ts[2]):null;
+  const dMax=Math.ceil(Math.max(vcx*1.4,...(D||[]).map(x=>Math.min(x.ts[2],3)*100*1.05),1)/10)*10;
+  const hD=box(`TLBT Vật chất xe trên ${nf0.format(vcx)}% 3 tháng liên tiếp`,cnt(D)+(rng?` · ${rng} · TLBT lũy kế T${m}`:""),D,x=>
+    row(x.u,`<span class="wtrk"><span class="wfill" style="width:${pc(x.ts[2]*100/dMax*100)}%;background:var(--bad)"></span><span class="wthr" style="left:${pc(vcx/dMax*100)}%"></span></span>`,P(x.ts[2]),"bad",`${x.u}: TLBT VCX lũy kế ${months.map((k,i)=>`T${k} ${P(x.ts[i])}`).join(" · ")}`),scale(vcx,dMax));
+
+  el.innerHTML=hA+hB+hC+hD;
+  el.querySelectorAll(".wrow[data-u]").forEach(r=>{const go=()=>selUnit(r.dataset.u);r.onclick=go;r.onkeydown=e=>{if(e.key==="Enter")go()}});
+}
+
+$("app").addEventListener("input",e=>{const t=e.target;if(t.id==="warnRevPct"){S.warnRev=t.value===""?0:+t.value;drawWarnings()}else if(t.id==="warnVcxTlbt"){S.warnVcx=t.value===""?0:+t.value;drawWarnings()}});
 const REDRAW={cTrend:()=>drawTrend(),cYoy:()=>drawYoy(),cWf:()=>drawWf(),cMix:()=>drawMix(),cUnits:()=>drawUnits(),cUyoy:()=>drawUyoy(),cTlNv:()=>drawTlNv(),cTlU:()=>drawTlU()};
 $("app").addEventListener("click",e=>{const b=e.target.closest(".lgb");if(!b)return;const box=b.closest("[data-chart]");if(!box)return;const c=box.dataset.chart,key=c+":"+b.dataset.k;
   if(S.hid.has(key))S.hid.delete(key);else S.hid.add(key);hideTip();syncLegends();if(REDRAW[c])REDRAW[c]()});
