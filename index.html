@@ -279,9 +279,10 @@ function renderControls(){
   document.querySelectorAll("#fView button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===S.view));
   $("vQ").textContent=`Quý ${ROM[qOf(S.month)-1]}`;
 }
+function fmtDMY(d){const z=n=>String(n).padStart(2,"0");return z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear()}
 function renderSource(){
-  const m=S.meta||{};let when="";if(m.at){const t=new Date(m.at);if(!isNaN(t))when=t.toLocaleString("vi-VN",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}
-  $("src").innerHTML=`<span class="chip">Nguồn <b>${esc(m.fileName||S.d.fileName||"file Excel")}</b></span>`+(when?`<span class="chip">Cập nhật <b>${esc(when)}</b></span>`:"")+`<span class="chip">Thực hiện đến <b>T${S.last}/${S.year}</b></span>`+(S.local?`<span class="chip"><b>Bản xem tạm</b></span>`:"");
+  const m=S.meta||{};
+  $("src").innerHTML=`<span class="chip">Thực hiện đến <b>${esc(m.asOf||fmtDMY(new Date()))}</b></span>`;
 }
 
 /* ---------- page ---------- */
@@ -677,7 +678,9 @@ async function loadDefault(){
     const buf=await r.arrayBuffer();
     const wb=XLSX.read(buf,{type:"array"});
     const d=parseWorkbook(wb);d.fileName="data.xlsx";
-    setData(d,{fileName:"data.xlsx",at:r.headers.get("last-modified"),fresh:true});
+    const lm=r.headers.get("last-modified"),lmDate=lm?new Date(lm):null;
+    const asOf=fmtDMY(lmDate&&!isNaN(lmDate)?lmDate:new Date());
+    setData(d,{fileName:"data.xlsx",at:lm,asOf,fresh:true});
     banner("");
   }catch(e){fail(e&&e.message||String(e))}
 }
