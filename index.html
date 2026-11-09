@@ -159,6 +159,7 @@ tr.sel td{background:var(--accent-soft)!important}
 tr.lv0 td{font-weight:700} tr.lv1 td{font-weight:600}
 tr.lv2 td:first-child{padding-left:24px;color:var(--ink-2)} tr.lv3 td:first-child{padding-left:40px;color:var(--ink-2)}
 tr.total td{font-weight:700;background:var(--panel-2)}
+.col-divider{border-right:1px solid var(--axis)!important}
 .muted{color:var(--muted)}
 .tip{position:fixed;z-index:20;pointer-events:none;background:var(--ink);color:var(--bg);padding:8px 10px;border-radius:8px;font-size:12px;line-height:1.5;max-width:270px;box-shadow:0 4px 16px rgba(0,0,0,.18);font-variant-numeric:tabular-nums}
 .tip[hidden]{display:none}
@@ -240,7 +241,7 @@ const div=(a,b)=>b?a/b:null, gr=(a,b)=>b?a/b-1:null;
 const cls=x=>!ok(x)?"":x>0?"up":x<0?"down":"";
 const nvName=n=>n==="Chung"?"Tất cả nghiệp vụ":n;
 function stat(p){if(p==null)return["na","—"];if(p>=1)return["good","Đạt"];if(p>=.85)return["warn","Gần đạt"];return["bad","Thấp"]}
-const pill=p=>{const[c]=stat(p);return `<span class="pill ${c}">${c==="good"?"▲":c==="bad"?"▼":c==="warn"?"●":""} ${P(p)}</span>`};
+const pill=(p,noIcon)=>{const[c]=stat(p);return noIcon?`<span class="pill ${c}">${P(p)}</span>`:`<span class="pill ${c}">${c==="good"?"▲":c==="bad"?"▼":c==="warn"?"●":""} ${P(p)}</span>`};
 
 /* ---------- data ---------- */
 function setData(d,meta){
@@ -329,12 +330,12 @@ function renderAll(){
   const pPrevLk=m>1?div(v(0,Y,m-1,u,1,n),v(1,Y,m-1,u,1,n)):null;
   const gPrevLk=m>1?gr(v(0,Y,m-1,u,1,n),v(0,Y-1,m-1,u,1,n)):null;
   let h=`<div class="kpis">`;
-  h+=kpi(`Doanh thu tháng ${m}`,T(o.th),"tỷ",`${pill(o.p)}<span>KH ${T(o.kh)}</span><span class="${cls(o.mom)}">${SP(o.mom)} so T${m-1||"–"}</span><span class="${cls(o.g)}">${SP(o.g)} svck (${T(o.ck)})</span>`);
-  h+=kpi(`Doanh thu ${qLbl(m)}`,T(o.thQ),"tỷ",`${pill(o.pQ)}<span>KH ${T(o.khQ)}</span><span class="${cls(o.gQ)}">${SP(o.gQ)} svck (${T(o.ckQ)})</span>${o.khQf>o.khQ+1?`<span>= ${P(o.pQf)} KH cả quý ${T(o.khQf)}</span>`:""}`);
-  h+=kpi(`Lũy kế ${m} tháng`,T(o.thLk),"tỷ",`${pill(o.pLk)}<span>KH ${T(o.khLk)}</span>`);
+  h+=kpi(`Doanh thu tháng ${m}`,T(o.th),"tỷ",`${pill(o.p,true)}<span>KH ${T(o.kh)}</span><span class="${cls(o.mom)}">${SP(o.mom)} so T${m-1||"–"}</span><span class="${cls(o.g)}">${SP(o.g)} svck (${T(o.ck)})</span>`);
+  h+=kpi(`Doanh thu ${qLbl(m)}`,T(o.thQ),"tỷ",`${pill(o.pQ,true)}<span>KH ${T(o.khQ)}</span><span class="${cls(o.gQ)}">${SP(o.gQ)} svck (${T(o.ckQ)})</span>${o.khQf>o.khQ+1?`<span>= ${P(o.pQf)} KH cả quý ${T(o.khQf)}</span>`:""}`);
+  h+=kpi(`Lũy kế ${m} tháng`,T(o.thLk),"tỷ",`${pill(o.pLk,true)}<span>KH ${T(o.khLk)}</span>`);
   h+=kpi(`Lũy kế cùng kỳ ${Y-1}`,T(o.ckLk),"tỷ",`<span class="${cls(o.gLk)}">${SP(o.gLk)} svck</span><span class="${cls(o.dCkLk)}">${ST(o.dCkLk)} tỷ</span>`);
   h+=kpi(`Hoàn thành KH năm`,P(o.pNam),"",`<span>KH ${T(o.khNam)}</span><span>= ${P(o.pCkNam)} cả năm ${Y-1} (${T(o.ckNam)})</span>`,o.pNam);
-  h+=kpi(`Cần bình quân / tháng`,o.need==null?"—":T(o.need),o.need==null?"":"tỷ",o.need!=null?`<span>${o.daysLeft} ngày còn lại</span>${avg3!=null?`<span class="${o.need>avg3*1.15?"down":"up"}">BQ 3 tháng gần nhất (${monthStr}) ${T(avg3)}</span>`:""}`:`<span>Hết năm kế hoạch</span>`);
+  h+=kpi(`Cần bình quân/tháng để hoàn thành KH năm`,o.need==null?"—":T(o.need),o.need==null?"":"tỷ",o.need!=null?`<span>${o.daysLeft} ngày còn lại</span>${avg3!=null?`<span class="${o.need>avg3*1.15?"down":"up"}">BQ 3 tháng gần nhất (${monthStr}) ${T(avg3)}</span>`:""}`:`<span>Hết năm kế hoạch</span>`);
   h+=kpi(`TLBT lũy kế`,o.tl==null?"—":P(o.tl),"",`<span>${Y-1}: ${o.tlCk==null?"—":P(o.tlCk)}</span>${o.dTl==null?"":`<span class="${o.dTl>0?"down":"up"}">${SPP(o.dTl)}</span>`}`);
   {const ul=unitList(n).map(x=>M(x,n));const okU=ul.filter(q=>q.pLk!=null&&q.pLk>=1).length,wP=ul.filter(q=>q.pLk!=null).length,upU=ul.filter(q=>ok(q.gLk)&&q.gLk>0).length,wG=ul.filter(q=>ok(q.gLk)).length;
    h+=kpi(`Đơn vị đạt KH lũy kế`,`${okU}/${wP}`,"",`<span>${upU}/${wG} đơn vị tăng trưởng svck</span>`,wP?okU/wP:null)}
@@ -373,7 +374,7 @@ function renderAll(){
 
   /* Đơn vị */
   h+=`<section class="sec"><div class="st"><h2>Theo đơn vị</h2><span class="sub">${esc(nvName(n))} · ${viewLbl()} · ${S.grp==="all"?"tất cả khối":S.grp==="TSC"?"Ban KD Trụ sở chính":"Công ty thành viên"}</span></div><div class="g2">`;
-  h+=card("cUnits",S.view==="nam"?"Tiến độ hoàn thành KH năm":"Tỷ lệ hoàn thành kế hoạch",S.view==="nam"?"Vạch đứng: tiến độ thời gian":"Vạch đứng: 100%",lgPill("good","good","▲ Đạt","≥100%")+lgPill("warn","warn","● Gần đạt","85–100%")+lgPill("bad","bad","▼ Thấp","&lt;85%"));
+  h+=card("cUnits",S.view==="nam"?"Tiến độ hoàn thành KH năm":"Tỷ lệ hoàn thành kế hoạch",S.view==="nam"?"Vạch đứng: tiến độ thời gian":"Vạch đứng: 100%",lgPill("good","good","Đạt","≥100%")+lgPill("warn","warn","Gần đạt","85–100%")+lgPill("bad","bad","Thấp","&lt;85%"));
   h+=card("cUyoy",`Tăng trưởng so với cùng kỳ ${Y-1}`,S.view==="nam"?"lũy kế":viewLbl(),lg("var(--s1)","Tăng","","up")+lg("var(--bad)","Giảm","","down"));
   h+=`</div><div class="g32">`;
   h+=card("cHeat",S.view==="m"?"Tỷ lệ hoàn thành KH tháng, từng tháng":S.view==="q"?"Tỷ lệ hoàn thành KH quý, từng quý":"Tỷ lệ hoàn thành KH lũy kế, từng tháng","Xanh: vượt KH · đỏ: dưới KH",`<span><i class="sw" style="background:color-mix(in srgb,var(--bad) 75%,var(--mid))"></i>&lt;70%</span><span><i class="sw" style="background:var(--mid)"></i>100%</span><span><i class="sw" style="background:color-mix(in srgb,var(--s1) 85%,var(--mid))"></i>≥140%</span>`);
@@ -552,13 +553,18 @@ function drawMix(){
   hover(el,".hit",i=>{const h=hits[i];return `<b>${esc(h.k)} · ${h.y}</b><br>${T(h.v)} tỷ · ${P(h.s)} cơ cấu`});
 }
 
+/* vạch dọc ngăn nhóm Tháng | Quý | Lũy kế | Cả năm: cột cuối của nhóm Tháng (ô 5), Quý (ô 10), Lũy kế (ô 16) */
+function markDividers(t){
+  t.querySelectorAll("thead tr:not(.grp),tbody tr").forEach(r=>[5,10,16].forEach(i=>{if(r.cells[i])r.cells[i].classList.add("col-divider")}));
+  const g=t.querySelector("thead tr.grp");if(g)[1,2,3].forEach(i=>{if(g.cells[i])g.cells[i].classList.add("col-divider")});
+}
 function drawNv(){
   const t=$("tNv");if(!t)return;const u=S.unit,m=S.month,Y=S.year;
   let h=`<thead><tr class="grp"><th></th><th colspan="5">Tháng ${m}</th><th colspan="5">${qLbl(m).replace(/^q/,"Q")}</th><th colspan="6">Lũy kế ${m} tháng</th><th colspan="3">Cả năm</th><th colspan="2">TLBT lũy kế</th></tr>
   <tr><th>Nghiệp vụ</th><th>KH</th><th>TH ${Y}</th><th>% KH</th><th>CK ${Y-1}</th><th>Tăng trưởng</th><th>KH</th><th>TH ${Y}</th><th>% KH</th><th>CK ${Y-1}</th><th>Tăng trưởng</th><th>KH</th><th>TH ${Y}</th><th>% KH</th><th>CK ${Y-1}</th><th>± tỷ</th><th>Tăng trưởng</th><th>KH ${Y}</th><th>% KH năm</th><th>TH ${Y-1}</th><th>${Y}</th><th>${Y-1}</th></tr></thead><tbody>`;
   for(const n of S.d.nv){const o=M(u,n),lv=NV_LEVEL[n]??1;
-    h+=`<tr class="click lv${lv} ${n===S.nv?"sel":""}" data-nv="${esc(n)}" tabindex="0"><td>${esc(n==="Chung"?"Tổng cộng":n)}</td><td>${T(o.kh)}</td><td>${T(o.th)}</td><td>${pill(o.p)}</td><td class="ck">${T(o.ck)}</td><td class="${cls(o.g)}">${SP(o.g)}</td><td>${T(o.khQ)}</td><td>${T(o.thQ)}</td><td>${pill(o.pQ)}</td><td class="ck">${T(o.ckQ)}</td><td class="${cls(o.gQ)}">${SP(o.gQ)}</td><td>${T(o.khLk)}</td><td>${T(o.thLk)}</td><td>${pill(o.pLk)}</td><td class="ck">${T(o.ckLk)}</td><td class="${cls(o.dCkLk)}">${ST(o.dCkLk)}</td><td class="${cls(o.gLk)}">${SP(o.gLk)}</td><td>${T(o.khNam)}</td><td>${P(o.pNam)}</td><td class="ck">${T(o.ckNam)}</td><td>${o.tl==null?"—":P(o.tl)}</td><td class="ck">${o.tlCk==null?"—":P(o.tlCk)}</td></tr>`}
-  t.innerHTML=h+"</tbody>";
+    h+=`<tr class="click lv${lv} ${n===S.nv?"sel":""}" data-nv="${esc(n)}" tabindex="0"><td>${esc(n==="Chung"?"Tổng cộng":n)}</td><td>${T(o.kh)}</td><td>${T(o.th)}</td><td>${pill(o.p,true)}</td><td class="ck">${T(o.ck)}</td><td class="${cls(o.g)}">${SP(o.g)}</td><td>${T(o.khQ)}</td><td>${T(o.thQ)}</td><td>${pill(o.pQ,true)}</td><td class="ck">${T(o.ckQ)}</td><td class="${cls(o.gQ)}">${SP(o.gQ)}</td><td>${T(o.khLk)}</td><td>${T(o.thLk)}</td><td>${pill(o.pLk,true)}</td><td class="ck">${T(o.ckLk)}</td><td class="${cls(o.dCkLk)}">${ST(o.dCkLk)}</td><td class="${cls(o.gLk)}">${SP(o.gLk)}</td><td>${T(o.khNam)}</td><td>${P(o.pNam)}</td><td class="ck">${T(o.ckNam)}</td><td>${o.tl==null?"—":P(o.tl)}</td><td class="ck">${o.tlCk==null?"—":P(o.tlCk)}</td></tr>`}
+  t.innerHTML=h+"</tbody>";markDividers(t);
   t.querySelectorAll("tr[data-nv]").forEach(r=>{const go=()=>{S.nv=r.dataset.nv;renderAll()};r.onclick=go;r.onkeydown=e=>{if(e.key==="Enter")go()}});
 }
 function selUnit(u){S.unit=S.unit===u?S.company:u;hideTip();renderAll()}
@@ -627,10 +633,10 @@ function drawUnitTable(){
   rows.sort((a,b)=>{if(k==="u")return dir*a.u.localeCompare(b.u,"vi");const av=a[k],bv=b[k];if(!ok(av))return 1;if(!ok(bv))return-1;return dir*(av-bv)});
   const cols=[["u","Đơn vị / Ban",""],["kh","KH",""],["th","TH "+Y,""],["p","% KH",""],["ck","CK "+(Y-1),"ck"],["g","Tăng trưởng",""],["khQ","KH",""],["thQ","TH "+Y,""],["pQ","% KH",""],["ckQ","CK "+(Y-1),"ck"],["gQ","Tăng trưởng",""],["khLk","KH",""],["thLk","TH "+Y,""],["pLk","% KH",""],["ckLk","CK "+(Y-1),"ck"],["dCkLk","± tỷ",""],["gLk","Tăng trưởng",""],["khNam","KH "+Y,""],["pNam","% KH năm",""],["ckNam","TH "+(Y-1),"ck"],["need","Cần/tháng",""],["tl","TLBT "+Y,""],["dTl","± TLBT",""]];
   let h=`<thead><tr class="grp"><th></th><th colspan="5">Tháng ${S.month}</th><th colspan="5">${qLbl(S.month).replace(/^q/,"Q")}</th><th colspan="6">Lũy kế ${S.month} tháng</th><th colspan="4">Cả năm</th><th colspan="2">Bồi thường</th></tr><tr>${cols.map(([c,l])=>`<th class="sortable" data-k="${c}" tabindex="0">${l}${k===c?`<span class="arr">${dir>0?"▲":"▼"}</span>`:""}</th>`).join("")}</tr></thead><tbody>`;
-  const row=(o,name,extra)=>`<tr ${extra}><td>${esc(name)}</td><td>${T(o.kh)}</td><td>${T(o.th)}</td><td>${pill(o.p)}</td><td class="ck">${T(o.ck)}</td><td class="${cls(o.g)}">${SP(o.g)}</td><td>${T(o.khQ)}</td><td>${T(o.thQ)}</td><td>${pill(o.pQ)}</td><td class="ck">${T(o.ckQ)}</td><td class="${cls(o.gQ)}">${SP(o.gQ)}</td><td>${T(o.khLk)}</td><td>${T(o.thLk)}</td><td>${pill(o.pLk)}</td><td class="ck">${T(o.ckLk)}</td><td class="${cls(o.dCkLk)}">${ST(o.dCkLk)}</td><td class="${cls(o.gLk)}">${SP(o.gLk)}</td><td>${T(o.khNam)}</td><td>${P(o.pNam)}</td><td class="ck">${T(o.ckNam)}</td><td>${o.need==null?"—":T(o.need)}</td><td>${o.tl==null?"—":P(o.tl)}</td><td class="${o.dTl==null?"":o.dTl>0?"down":"up"}">${SPP(o.dTl)}</td></tr>`;
+  const row=(o,name,extra)=>`<tr ${extra}><td>${esc(name)}</td><td>${T(o.kh)}</td><td>${T(o.th)}</td><td>${pill(o.p,true)}</td><td class="ck">${T(o.ck)}</td><td class="${cls(o.g)}">${SP(o.g)}</td><td>${T(o.khQ)}</td><td>${T(o.thQ)}</td><td>${pill(o.pQ,true)}</td><td class="ck">${T(o.ckQ)}</td><td class="${cls(o.gQ)}">${SP(o.gQ)}</td><td>${T(o.khLk)}</td><td>${T(o.thLk)}</td><td>${pill(o.pLk,true)}</td><td class="ck">${T(o.ckLk)}</td><td class="${cls(o.dCkLk)}">${ST(o.dCkLk)}</td><td class="${cls(o.gLk)}">${SP(o.gLk)}</td><td>${T(o.khNam)}</td><td>${P(o.pNam)}</td><td class="ck">${T(o.ckNam)}</td><td>${o.need==null?"—":T(o.need)}</td><td>${o.tl==null?"—":P(o.tl)}</td><td class="${o.dTl==null?"":o.dTl>0?"down":"up"}">${SPP(o.dTl)}</td></tr>`;
   for(const o of rows)h+=row(o,o.u,`class="click ${o.u===S.unit?"sel":""}" data-u="${esc(o.u)}" tabindex="0"`);
   h+=row(M(S.company,n),"Tổng công ty",`class="total"`);
-  t.innerHTML=h+"</tbody>";
+  t.innerHTML=h+"</tbody>";markDividers(t);
   t.querySelectorAll("th[data-k]").forEach(th=>{const go=()=>{const kk=th.dataset.k;S.sort={k:kk,dir:S.sort.k===kk?-S.sort.dir:(kk==="u"?1:-1)};drawUnitTable()};th.onclick=go;th.onkeydown=e=>{if(e.key==="Enter")go()}});
   t.querySelectorAll("tr[data-u]").forEach(r=>{const go=()=>selUnit(r.dataset.u);r.onclick=go;r.onkeydown=e=>{if(e.key==="Enter")go()}});
 }
@@ -725,7 +731,7 @@ async function loadDefault(){
     const reportDate=readReportDate(wb);
     const asOf=reportDate?fmtDMY(reportDate):"—";
     setData(d,{fileName:"data.xlsx",at:lm,asOf,reportDate,fresh:true});
-    banner(reportDate?"":`Không đọc được ngày báo cáo từ các ô ${REPORT_DATE_CELLS.day}, ${REPORT_DATE_CELLS.month}, ${REPORT_DATE_CELLS.year} của sheet đầu tiên trong data.xlsx. Chỉ tiêu “Cần bình quân / tháng” đang tạm tính theo ngày hiện tại.`,!reportDate);
+    banner(reportDate?"":`Không đọc được ngày báo cáo từ các ô ${REPORT_DATE_CELLS.day}, ${REPORT_DATE_CELLS.month}, ${REPORT_DATE_CELLS.year} của sheet đầu tiên trong data.xlsx. Chỉ tiêu “Cần bình quân/tháng để hoàn thành KH năm” đang tạm tính theo ngày hiện tại.`,!reportDate);
   }catch(e){fail(e&&e.message||String(e))}
 }
 /* ---------- Netlify Identity ---------- */
