@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <style>html{color-scheme:light}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
 </head>
 <body>
@@ -170,7 +171,27 @@ tr.total td{font-weight:700;background:var(--panel-2)}
 .lgb.off{opacity:.45;text-decoration:line-through}
 .lgb.off .sw{background:transparent!important;box-shadow:inset 0 0 0 1.5px var(--muted)}
 .lgb:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.login{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:var(--head)}
+.login[hidden]{display:none}
+.login-box{width:100%;max-width:380px;background:var(--panel);color:var(--ink);border-radius:14px;padding:28px 24px;display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.login-box .k{font-size:11px;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.login-box h2{font-size:18px}
+.login-box p{margin:0;color:var(--ink-2);font-size:13px}
+.login-box .btn{width:100%;padding:10px 14px;font-size:14px}
+.login-msg{font-size:12.5px;color:var(--bad-ink);min-height:1em}
+.hd .btn.out{font-size:11.5px;padding:3px 10px;border-radius:999px;background:var(--head-ctl);color:var(--head-ink);border-color:var(--head-ctl);font-weight:500}
+.hd .btn.out:hover{border-color:var(--head-mute)}
 </style>
+
+<div id="login" class="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="login-box">
+    <span class="k">BẢO HIỂM HÙNG VƯƠNG</span>
+    <h2 id="loginTitle">Theo dõi kinh doanh &amp; kế hoạch</h2>
+    <p>Trang chỉ dành cho tài khoản được mời. Vui lòng đăng nhập để xem số liệu.</p>
+    <button type="button" class="btn" id="loginBtn">Đăng nhập hệ thống</button>
+    <div class="login-msg" id="loginMsg" role="status"></div>
+  </div>
+</div>
 
 <header class="hd gut">
   <div class="in">
@@ -184,14 +205,14 @@ tr.total td{font-weight:700;background:var(--panel-2)}
       <div class="f"><label for="fNv">Nghiệp vụ</label><select id="fNv"></select></div>
       <div class="f"><label for="fGrp">Khối đơn vị</label><select id="fGrp"><option value="all">Tất cả</option><option value="TSC">Ban KD Trụ sở chính</option><option value="Đơn vị">Công ty thành viên</option></select></div>
       <div class="f"><span class="lbl" id="lView">Góc nhìn</span><div class="seg" role="group" aria-labelledby="lView" id="fView"><button type="button" data-v="m">Tháng</button><button type="button" data-v="q" id="vQ">Quý</button><button type="button" data-v="lk">Lũy kế</button><button type="button" data-v="nam">Cả năm</button></div></div>
-      <div class="chips tools"><span id="src" class="chips"></span></div>
+      <div class="chips tools"><span id="src" class="chips"></span><button type="button" class="btn out" id="logoutBtn" hidden>Đăng xuất</button></div>
     </div>
   </div>
 </header>
 
 <main class="in gut">
   <div id="banner" class="banner" hidden></div>
-  <div id="app"><div class="loading">Đang tải dữ liệu…</div></div>
+  <div id="app" style="display:none"><div class="loading">Đang tải dữ liệu…</div></div>
   <div class="foot">
     <div>Doanh thu thực hiện 2026, cùng kỳ 2025, kế hoạch 2026 và TLBT đọc từ sheet “tổng hợp” (cột Loại · Năm · Tháng · Đơn vị/Ban KD · Phân loại · Số liệu · Nghiệp vụ · Doanh thu · TLBT). Tỷ lệ hoàn thành và tăng trưởng được tính lại từ doanh thu.</div>
     <div>Góc nhìn “Cả năm” so lũy kế với kế hoạch năm và với cả năm 2025. Dữ liệu được tải tự động từ file <b>data.xlsx</b>; để cập nhật, thay file này (giữ nguyên tên cột) rồi tải lại trang.</div>
@@ -248,7 +269,11 @@ function M(u,n,m){
   o.prev=m>1?v(0,Y,m-1,u,0,n):null;
   o.p=div(o.th,o.kh);o.pLk=div(o.thLk,o.khLk);o.g=gr(o.th,o.ck);o.gLk=gr(o.thLk,o.ckLk);o.mom=o.prev==null?null:gr(o.th,o.prev);
   o.dCk=o.th-o.ck;o.dCkLk=o.thLk-o.ckLk;
-  o.pNam=div(o.thLk,o.khNam);o.pCkNam=div(o.thLk,o.ckNam);o.rem=o.khNam-o.thLk;o.left=12-m;o.need=o.left>0?Math.max(o.rem,0)/o.left:null;
+  o.pNam=div(o.thLk,o.khNam);o.pCkNam=div(o.thLk,o.ckNam);o.rem=o.khNam-o.thLk;
+  {let from;if(m<S.last)from=new Date(S.year,m,0);else{const at=new Date((S.meta||{}).at);from=isNaN(at)?new Date():at}
+   const daysLeft=(new Date(S.year+1,0,1)-from)/864e5;
+   o.need=daysLeft>0?(Math.max(o.rem,0)/daysLeft)*30:null;
+   o.daysLeft=Math.max(0,Math.round(daysLeft))}
   o.dTl=o.tl!=null&&o.tlCk!=null?o.tl-o.tlCk:null;
   {const q=qOf(m),a=3*q-2;o.thQ=sumM(0,Y,u,n,a,m);o.khQ=sumM(1,Y,u,n,a,m);o.ckQ=sumM(0,Y-1,u,n,a,m);o.khQf=sumM(1,Y,u,n,a,3*q);o.ckQf=sumM(0,Y-1,u,n,a,3*q);
    o.pQ=div(o.thQ,o.khQ);o.gQ=gr(o.thQ,o.ckQ);o.dCkQ=o.thQ-o.ckQ;o.pQf=div(o.thQ,o.khQf)}
@@ -296,7 +321,9 @@ function renderAll(){
   renderControls();renderSource();
   const u=S.unit,n=S.nv,m=S.month,o=M(u,n),Y=S.year;
   const uname=u===S.company?"Toàn công ty":u;
-  const p3=[];for(let k=Math.max(1,m-2);k<=m;k++)p3.push(v(0,Y,k,u,0,n));const avg3=p3.reduce((a,b)=>a+b,0)/p3.length;
+  const p3=[],pm=[];for(let k=Math.max(1,m-3);k<=m-1;k++){p3.push(v(0,Y,k,u,0,n));pm.push(k)}
+  const avg3=p3.length?p3.reduce((a,b)=>a+b,0)/p3.length:null;
+  const monthStr=pm.length?"T"+pm.join(","):"";
   const pPrevLk=m>1?div(v(0,Y,m-1,u,1,n),v(1,Y,m-1,u,1,n)):null;
   const gPrevLk=m>1?gr(v(0,Y,m-1,u,1,n),v(0,Y-1,m-1,u,1,n)):null;
   let h=`<div class="kpis">`;
@@ -305,7 +332,7 @@ function renderAll(){
   h+=kpi(`Lũy kế ${m} tháng`,T(o.thLk),"tỷ",`${pill(o.pLk)}<span>KH ${T(o.khLk)}</span>`);
   h+=kpi(`Lũy kế cùng kỳ ${Y-1}`,T(o.ckLk),"tỷ",`<span class="${cls(o.gLk)}">${SP(o.gLk)} svck</span><span class="${cls(o.dCkLk)}">${ST(o.dCkLk)} tỷ</span>`);
   h+=kpi(`Hoàn thành KH năm`,P(o.pNam),"",`<span>KH ${T(o.khNam)}</span><span>= ${P(o.pCkNam)} cả năm ${Y-1} (${T(o.ckNam)})</span>`,o.pNam);
-  h+=kpi(`Cần bình quân / tháng`,o.need==null?"—":T(o.need),o.need==null?"":"tỷ",o.left>0?`<span>${o.left} tháng còn lại</span><span class="${o.need>avg3*1.15?"down":"up"}">BQ 3 tháng ${T(avg3)}</span>`:`<span>Hết năm kế hoạch</span>`);
+  h+=kpi(`Cần bình quân / tháng`,o.need==null?"—":T(o.need),o.need==null?"":"tỷ",o.need!=null?`<span>${o.daysLeft} ngày còn lại</span>${avg3!=null?`<span class="${o.need>avg3*1.15?"down":"up"}">BQ 3 tháng gần nhất (${monthStr}) ${T(avg3)}</span>`:""}`:`<span>Hết năm kế hoạch</span>`);
   h+=kpi(`TLBT lũy kế`,o.tl==null?"—":P(o.tl),"",`<span>${Y-1}: ${o.tlCk==null?"—":P(o.tlCk)}</span>${o.dTl==null?"":`<span class="${o.dTl>0?"down":"up"}">${SPP(o.dTl)}</span>`}`);
   {const ul=unitList(n).map(x=>M(x,n));const okU=ul.filter(q=>q.pLk!=null&&q.pLk>=1).length,wP=ul.filter(q=>q.pLk!=null).length,upU=ul.filter(q=>ok(q.gLk)&&q.gLk>0).length,wG=ul.filter(q=>ok(q.gLk)).length;
    h+=kpi(`Đơn vị đạt KH lũy kế`,`${okU}/${wP}`,"",`<span>${upU}/${wG} đơn vị tăng trưởng svck</span>`,wP?okU/wP:null)}
@@ -325,7 +352,7 @@ function renderAll(){
     const dn=ul.slice().sort((a,b)=>a.d-b.d).filter(x=>x.d<0).slice(0,3),up=ul.slice().sort((a,b)=>b.d-a.d).filter(x=>x.d>0).slice(0,3);
     if(dn.length||up.length)ins.push(`So với cùng kỳ: tăng mạnh nhất ${up.map(x=>esc(short(x.u))+" "+ST(x.d)).join(", ")||"—"}; giảm mạnh nhất ${dn.map(x=>esc(short(x.u))+" "+ST(x.d)).join(", ")||"—"} (tỷ).`);
   }
-  if(o.left>0&&o.khNam>0){const r=div(o.need,avg3);ins.push(`Để hoàn thành KH năm còn <b>${T(Math.max(o.rem,0))} tỷ</b>, tức ${T(o.need)} tỷ/tháng${r!=null?(r>1.15?`, gấp <b>${nf1.format(r)} lần</b> bình quân 3 tháng gần nhất (${T(avg3)})`:`, trong tầm bình quân 3 tháng gần nhất (${T(avg3)})`):""}. Đến nay đã bằng ${P(o.pCkNam)} doanh thu cả năm ${Y-1}.`)}
+  if(o.need!=null&&o.khNam>0){const r=avg3!=null?div(o.need,avg3):null;ins.push(`Để hoàn thành KH năm còn <b>${T(Math.max(o.rem,0))} tỷ</b>, tức ${T(o.need)} tỷ/tháng${r!=null?(r>1.15?`, gấp <b>${nf1.format(r)} lần</b> bình quân 3 tháng gần nhất ${monthStr} (${T(avg3)})`:`, trong tầm bình quân 3 tháng gần nhất ${monthStr} (${T(avg3)})`):""}. Đến nay đã bằng ${P(o.pCkNam)} doanh thu cả năm ${Y-1}.`)}
   if(o.tl!=null)ins.push(`TLBT lũy kế ${P(o.tl)}${o.tlCk!=null?`, ${o.dTl>0?"<span class='down'>tăng</span>":"<span class='up'>giảm</span>"} ${nf1.format(Math.abs(o.dTl*100))} điểm so với cùng kỳ (${P(o.tlCk)})`:""}.`);
   h+=`<div class="card"><div class="ch"><h3>Điểm chính · ${esc(uname)} · ${esc(nvName(n))}</h3><span class="sub">Tự sinh từ số liệu theo bộ lọc</span></div><ul class="insights">${ins.map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
   h+=`<div class="card"><div class="ch"><h3>Cảnh báo · tháng ${m}/${Y}</h3><span class="sub">Toàn bộ đơn vị, trừ Tổng công ty</span></div><div class="warn-ctl"><label for="warnRevPct">Ngưỡng hoàn thành KH lũy kế dưới <input id="warnRevPct" type="number" min="0" max="500" step="1" value="${S.warnRev}"> %</label><label for="warnVcxTlbt">Ngưỡng TLBT Vật chất xe trên <input id="warnVcxTlbt" type="number" min="0" max="500" step="1" value="${S.warnVcx}"> %</label></div><div class="wgrid" id="warnList"></div></div>`;
@@ -684,7 +711,30 @@ async function loadDefault(){
     banner("");
   }catch(e){fail(e&&e.message||String(e))}
 }
-loadDefault();
+/* ---------- Netlify Identity ---------- */
+let loaded=false;
+function showApp(user){
+  $("login").hidden=true;$("app").style.display="";$("logoutBtn").hidden=false;
+  $("logoutBtn").title=user&&user.email?"Đang đăng nhập: "+user.email:"";
+  if(!loaded){loaded=true;loadDefault()}
+}
+function showLogin(msg){
+  $("login").hidden=false;$("app").style.display="none";$("logoutBtn").hidden=true;banner("");hideTip();
+  $("loginMsg").textContent=msg||"";
+  if(loaded){loaded=false;S.d=null;$("app").innerHTML='<div class="loading">Đang tải dữ liệu…</div>';$("src").innerHTML=""}
+}
+const ni=window.netlifyIdentity;
+if(!ni){
+  showLogin("Không tải được dịch vụ đăng nhập. Hãy kiểm tra kết nối mạng rồi tải lại trang.");
+  $("loginBtn").disabled=true;
+}else{
+  ni.on("init",user=>{user?showApp(user):showLogin()});
+  ni.on("login",user=>{ni.close();showApp(user)});
+  ni.on("logout",()=>showLogin());
+  ni.on("error",e=>{$("loginMsg").textContent="Lỗi đăng nhập: "+(e&&e.message||e)});
+  $("loginBtn").onclick=()=>ni.open("login");
+  $("logoutBtn").onclick=()=>ni.logout();
+}
 })();
 </script>
 
