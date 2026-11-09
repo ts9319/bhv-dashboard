@@ -270,8 +270,10 @@ function M(u,n,m){
   o.p=div(o.th,o.kh);o.pLk=div(o.thLk,o.khLk);o.g=gr(o.th,o.ck);o.gLk=gr(o.thLk,o.ckLk);o.mom=o.prev==null?null:gr(o.th,o.prev);
   o.dCk=o.th-o.ck;o.dCkLk=o.thLk-o.ckLk;
   o.pNam=div(o.thLk,o.khNam);o.pCkNam=div(o.thLk,o.ckNam);o.rem=o.khNam-o.thLk;
-  {let from;if(m<S.last)from=new Date(S.year,m,0);else{const at=new Date((S.meta||{}).at);from=isNaN(at)?new Date():at}
-   const daysLeft=(new Date(S.year+1,0,1)-from)/864e5;
+  {const from=new Date((S.meta||{}).reportDate||new Date());
+   from.setHours(0,0,0,0);
+   const endOfYear=new Date(S.year+1,0,1);
+   const daysLeft=Math.max(0,(endOfYear-from)/864e5);
    o.need=daysLeft>0?(Math.max(o.rem,0)/daysLeft)*30:null;
    o.daysLeft=Math.max(0,Math.round(daysLeft))}
   o.dTl=o.tl!=null&&o.tlCk!=null?o.tl-o.tlCk:null;
@@ -307,7 +309,7 @@ function renderControls(){
 function fmtDMY(d){const z=n=>String(n).padStart(2,"0");return z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear()}
 function renderSource(){
   const m=S.meta||{};
-  $("src").innerHTML=`<span class="chip">Thực hiện đến <b>${esc(m.asOf||fmtDMY(new Date()))}</b></span>`;
+  $("src").innerHTML=`<span class="chip">Thực hiện đến <b>${esc(m.asOf||"—")}</b></span>`;
 }
 
 /* ---------- page ---------- */
@@ -696,6 +698,20 @@ function parseWorkbook(wb){
   }
   throw new Error("Không tìm thấy sheet có đủ các cột: Loại, Năm, Tháng, Đơn vị/Ban KD, Số liệu, Nghiệp vụ, Doanh thu.");
 }
+/* ==================================================================
+   NGÀY BÁO CÁO ("Thực hiện đến") — đọc từ 3 ô dọc trên sheet đầu tiên.
+   >>> Đổi địa chỉ ô ở đây nếu bố cục file Excel thay đổi. <<<
+   Hiện tại: M1:M3 là nhãn "d","m","y"; giá trị nằm ở N1 (ngày), N2 (tháng), N3 (năm).
+   ================================================================== */
+const REPORT_DATE_CELLS={day:"N1",month:"N2",year:"N3"};
+function readReportDate(wb){
+  const ws=wb.Sheets[wb.SheetNames[0]];if(!ws)return null;
+  const num=addr=>{const c=ws[addr];return c&&c.v!==""&&c.v!=null?Number(c.v):NaN};
+  const day=num(REPORT_DATE_CELLS.day),month=num(REPORT_DATE_CELLS.month),year=num(REPORT_DATE_CELLS.year);
+  if(![day,month,year].every(Number.isInteger)||month<1||month>12||day<1||day>31||year<2000)return null;
+  const reportDate=new Date(year,month-1,day);
+  return reportDate.getMonth()===month-1?reportDate:null; /* loại ngày không tồn tại, vd 31/02 */
+}
 async function loadDefault(){
   const fail=msg=>{banner(`Không tải được dữ liệu: ${esc(msg)}`,true);$("app").innerHTML=`<div class="loading">Không tải được <b>data.xlsx</b>. Hãy kiểm tra file đã được đặt ở thư mục gốc cùng trang này.</div>`};
   try{
@@ -705,10 +721,11 @@ async function loadDefault(){
     const buf=await r.arrayBuffer();
     const wb=XLSX.read(buf,{type:"array"});
     const d=parseWorkbook(wb);d.fileName="data.xlsx";
-    const lm=r.headers.get("last-modified"),lmDate=lm?new Date(lm):null;
-    const asOf=fmtDMY(lmDate&&!isNaN(lmDate)?lmDate:new Date());
-    setData(d,{fileName:"data.xlsx",at:lm,asOf,fresh:true});
-    banner("");
+    const lm=r.headers.get("last-modified");
+    const reportDate=readReportDate(wb);
+    const asOf=reportDate?fmtDMY(reportDate):"—";
+    setData(d,{fileName:"data.xlsx",at:lm,asOf,reportDate,fresh:true});
+    banner(reportDate?"":`Không đọc được ngày báo cáo từ các ô ${REPORT_DATE_CELLS.day}, ${REPORT_DATE_CELLS.month}, ${REPORT_DATE_CELLS.year} của sheet đầu tiên trong data.xlsx. Chỉ tiêu “Cần bình quân / tháng” đang tạm tính theo ngày hiện tại.`,!reportDate);
   }catch(e){fail(e&&e.message||String(e))}
 }
 /* ---------- Netlify Identity ---------- */
